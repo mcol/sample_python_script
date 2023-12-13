@@ -1,23 +1,10 @@
-from ctypes.wintypes import PSMALL_RECT
-from distutils.command.config import config
-from fileinput import filename
-from ntpath import join
-from tabnanny import filename_only
-from urllib.parse import SplitResult
-from sklearn.cluster import AgglomerativeClustering
-from tabulate import tabulate
-import pandas as pd
-import numpy as np
 import pytesseract
 import argparse
-import imutils
-import cv2
 import os
-import image as im
 import deep_translator
 from wand.image import Image as WImage
-from textblob import *
 from deep_translator import (GoogleTranslator)
+
 pytesseract.tesseract_cmd = r"tesseract"
 list = ["im1.jpg", "img2.jpg"]
 for item in list:
