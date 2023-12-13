@@ -33,11 +33,8 @@ def main(item, from_lang="en", to_lang="en", psm=3):
 	tess_options = "-l {} --psm {}".format(tess_lang, psm)
 
 	## image to process
-	if os.path.exists(item):
-		print("Processing image {}".format(item))
-	else:
-		print("Skipping non-existing file {}".format(item), file=sys.stderr)
-		return
+	if not os.path.exists(item):
+		raise FileNotFoundError
 
 	## temporary grayscale image
 	gray_item = 'gray_' + item
@@ -84,4 +81,10 @@ if __name__ == '__main__':
 	to_lang = args["to"]
 	psm = args["psm"]
 
-	main(image, from_lang, to_lang, psm)
+	try:
+		main(image, from_lang, to_lang, psm)
+		print("Processed image {}".format(image))
+	except FileNotFoundError:
+		print("Skipping non-existing file {}".format(image), file=sys.stderr)
+	except Exception as e:
+		print("Failed processing file {}, reason: {}".format(image, e.__class__.__name__), file=sys.stderr)
