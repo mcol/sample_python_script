@@ -8,6 +8,7 @@
 import pytesseract
 import argparse
 import os
+import sys
 import deep_translator
 from wand.image import Image as WImage
 from deep_translator import (GoogleTranslator)
@@ -44,7 +45,11 @@ tess_options = "-l {} --psm {}".format(tess_lang, args["psm"])
 
 ## image to process
 item = args["image"]
-print("Processing image {}".format(item))
+if os.path.exists(item):
+        print("Processing image {}".format(item))
+else:
+        print("Skipping non-existing file {}".format(item), file=sys.stderr)
+        quit()
 
 ## temporary grayscale image
 gray_item = 'gray_' + item
