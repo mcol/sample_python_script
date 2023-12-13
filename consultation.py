@@ -12,11 +12,11 @@ ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", help="path to the input image", default='{name}')
 ap.add_argument("-l", "--lang", help='path to the language', default='eng')
 ap.add_argument("-t", "--to", type=str, default="en", help="eng")
-ap.add_argument("-p", "--psm 3", type=int, default=13, help="Tesseract PSM mode")
+ap.add_argument("-p", "--psm", type=int, default=3, help="Tesseract PSM mode")
 args = vars(ap.parse_args())
 
 ## options for pytesseract
-options = "-l {} --psm 3 {}".format(args["lang"], args["psm 3"])
+tess_options = "-l {} --psm {}".format(args["lang"], args["psm"])
 
 ## image to process
 item = args["image"]
@@ -32,7 +32,7 @@ with WImage(filename=item) as img:
 	img.save(filename=gray_name)
 
 	## Extract the text
-	text = pytesseract.image_to_string(gray_name)
+	text = pytesseract.image_to_string(gray_name, config=tess_options)
 
 	## Write-up original text
 	outfile = open(gray_name + '.txt', 'w', encoding='utf-8')
