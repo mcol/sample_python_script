@@ -29,20 +29,17 @@ def main(item, from_lang="en", to_lang="en", psm=3):
 	## is translation required?
 	translate = True if from_lang != to_lang else False
 
-	## options for pytesseract
-	tess_options = "-l {} --psm {}".format(tess_lang, psm)
-
 	## image to process
 	if not os.path.exists(item):
 		raise FileNotFoundError
-
-	## temporary grayscale image
-	gray_item = 'gray_' + item
 
 	## extensionless filename
 	item_filename = item.rsplit('.',1)[0]
 
 	with WImage(filename=item) as img:
+
+		## temporary grayscale image
+		gray_item = 'gray_' + item
 
 		## Transform image from color to grayscale
 		img.transform_colorspace('gray')
@@ -50,6 +47,7 @@ def main(item, from_lang="en", to_lang="en", psm=3):
 		img.save(filename=gray_item)
 
 		## Extract the text
+		tess_options = "-l {} --psm {}".format(tess_lang, psm)
 		text = pytesseract.image_to_string(gray_item, config=tess_options)
 
 		## Remove the grayscale image
