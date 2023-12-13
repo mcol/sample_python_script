@@ -41,6 +41,9 @@ print("Processing image {}".format(item))
 ## temporary grayscale image
 gray_item = 'gray_' + item
 
+## extensionless filename
+item_filename = item.rsplit('.',1)[0]
+
 with WImage(filename=item) as img:
 
 	## Transform image from color to grayscale
@@ -55,11 +58,11 @@ with WImage(filename=item) as img:
 	os.remove(gray_item)
 
 	## Write-up original text
-	with open(item + '.txt', 'w', encoding='utf-8') as outfile:
+	with open(item_filename + '_orig.txt', 'w', encoding='utf-8') as outfile:
 		outfile.write(text)
 
 	if translate:
 		## Write-up translated text
 		trans = GoogleTranslator(source=from_lang, target=to_lang).translate(text)
-		with open(item + '_translated.txt', 'w', encoding='utf-8') as f:
+		with open(item_filename + '_trans_' + to_lang + '.txt', 'w', encoding='utf-8') as f:
 			f.write(trans)
