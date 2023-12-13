@@ -5,13 +5,12 @@
 ## The path to the tesseract executable can be specified through the
 ## `pytesseract.pytesseract.tesseract_cmd` setting below, if it is not in the PATH.
 
-import pytesseract
-import argparse
 import os
 import sys
-import deep_translator
+import pytesseract
+from argparse import ArgumentParser as ArgParser
 from wand.image import Image as WImage
-from deep_translator import (GoogleTranslator)
+from deep_translator import GoogleTranslator
 
 ## tesseract and googletranslator use different iso639 codes:
 ## tesseract: iso639-2t (3-letter codes)
@@ -23,7 +22,7 @@ from iso639 import Language as iso
 pytesseract.pytesseract.tesseract_cmd = r"tesseract"
 
 ## command line arguments
-ap = argparse.ArgumentParser(description="Extract text from an image and optionally translate it to a second language")
+ap = ArgParser(description="Extract text from an image and optionally translate it to a second language")
 ap.add_argument("-i", "--image", help="path to the input image", required=True)
 ap.add_argument("-l", "--lang", help="input language (2-character ISO 639-1 language codes, default: 'en')", default="en")
 ap.add_argument("-t", "--to", type=str, help="translated language (2-charachter ISO 639-1 codes, default: 'en')", default="en")
