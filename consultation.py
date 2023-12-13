@@ -56,7 +56,6 @@ with WImage(filename=item) as img:
 
 	if translate:
 		## Write-up translated text
-		translated=GoogleTranslator(source=from_lang, target=to_lang).translate(text)
-		trans=str(translated)
+		trans = GoogleTranslator(source=from_lang, target=to_lang).translate(text)
 		with open(item + '_translated.txt', 'w', encoding='utf-8') as f:
 			f.write(trans)
