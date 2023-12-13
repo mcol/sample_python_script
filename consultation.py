@@ -1,3 +1,10 @@
+## Script to extract text from an image and optionally to translate it into a second
+## language.
+##
+## It requires Google's Tesseract-OCR Engine to be installed on the system.
+## The path to the tesseract executable can be specified through the
+## `pytesseract.pytesseract.tesseract_cmd` setting below, if it is not in the PATH.
+
 import pytesseract
 import argparse
 import os
@@ -11,7 +18,8 @@ from deep_translator import (GoogleTranslator)
 ## our script accepts 2-letter codes and uses the iso639 package to convert to 3-letter codes
 from iso639 import Language as iso
 
-pytesseract.tesseract_cmd = r"tesseract"
+## change the following if the tesseract binary is not in the PATH
+pytesseract.pytesseract.tesseract_cmd = r"tesseract"
 
 ## command line arguments
 ap = argparse.ArgumentParser(description="Extract text from an image and optionally translate it to a second language")
