@@ -38,17 +38,21 @@ tess_options = "-l {} --psm {}".format(tess_lang, args["psm"])
 item = args["image"]
 print("Processing image {}".format(item))
 
-gray_name = 'gray_' + item
+## temporary grayscale image
+gray_item = 'gray_' + item
 
 with WImage(filename=item) as img:
 
 	## Transform image from color to grayscale
 	img.transform_colorspace('gray')
 	img.adaptive_threshold(width=16, height=16, offset=0.15 * img.quantum_range)
-	img.save(filename=gray_name)
+	img.save(filename=gray_item)
 
 	## Extract the text
-	text = pytesseract.image_to_string(gray_name, config=tess_options)
+	text = pytesseract.image_to_string(gray_item, config=tess_options)
+
+	## Remove the grayscale image
+	os.remove(gray_item)
 
 	## Write-up original text
 	with open(item + '.txt', 'w', encoding='utf-8') as outfile:
