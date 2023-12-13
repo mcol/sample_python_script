@@ -21,60 +21,67 @@ from iso639 import Language as iso
 ## change the following if the tesseract binary is not in the PATH
 pytesseract.pytesseract.tesseract_cmd = r"tesseract"
 
-## command line arguments
-ap = ArgParser(description="Extract text from an image and optionally translate it to a second language")
-ap.add_argument("-i", "--image", help="path to the input image", required=True)
-ap.add_argument("-l", "--lang", help="input language (2-character ISO 639-1 language codes, default: 'en')", default="en")
-ap.add_argument("-t", "--to", type=str, help="translated language (2-charachter ISO 639-1 codes, default: 'en')", default="en")
-ap.add_argument("-p", "--psm", type=int, help="Tesseract PSM mode", default=3)
-args = vars(ap.parse_args())
+def main(item, from_lang="en", to_lang="en", psm=3):
 
-# 2 letter language codes
-from_lang = args["lang"]
-to_lang = args["to"]
+	## 3-letter code of the translation language
+	tess_lang = iso.from_part1(from_lang).part2t
 
-## 3-letter code of the translation language
-tess_lang = iso.from_part1(from_lang).part2t
+	## is translation required?
+	translate = True if from_lang != to_lang else False
 
-## is translation required?
-translate = True if from_lang != to_lang else False
+	## options for pytesseract
+	tess_options = "-l {} --psm {}".format(tess_lang, psm)
 
-## options for pytesseract
-tess_options = "-l {} --psm {}".format(tess_lang, args["psm"])
+	## image to process
+	if os.path.exists(item):
+		print("Processing image {}".format(item))
+	else:
+		print("Skipping non-existing file {}".format(item), file=sys.stderr)
+		return
 
-## image to process
-item = args["image"]
-if os.path.exists(item):
-        print("Processing image {}".format(item))
-else:
-        print("Skipping non-existing file {}".format(item), file=sys.stderr)
-        quit()
+	## temporary grayscale image
+	gray_item = 'gray_' + item
 
-## temporary grayscale image
-gray_item = 'gray_' + item
+	## extensionless filename
+	item_filename = item.rsplit('.',1)[0]
 
-## extensionless filename
-item_filename = item.rsplit('.',1)[0]
+	with WImage(filename=item) as img:
 
-with WImage(filename=item) as img:
+		## Transform image from color to grayscale
+		img.transform_colorspace('gray')
+		img.adaptive_threshold(width=16, height=16, offset=0.15 * img.quantum_range)
+		img.save(filename=gray_item)
 
-	## Transform image from color to grayscale
-	img.transform_colorspace('gray')
-	img.adaptive_threshold(width=16, height=16, offset=0.15 * img.quantum_range)
-	img.save(filename=gray_item)
+		## Extract the text
+		text = pytesseract.image_to_string(gray_item, config=tess_options)
 
-	## Extract the text
-	text = pytesseract.image_to_string(gray_item, config=tess_options)
+		## Remove the grayscale image
+		os.remove(gray_item)
 
-	## Remove the grayscale image
-	os.remove(gray_item)
+		## Write-up original text
+		with open(item_filename + '_orig.txt', 'w', encoding='utf-8') as outfile:
+			outfile.write(text)
 
-	## Write-up original text
-	with open(item_filename + '_orig.txt', 'w', encoding='utf-8') as outfile:
-		outfile.write(text)
+		if translate:
+			## Write-up translated text
+			trans = GoogleTranslator(source=from_lang, target=to_lang).translate(text)
+			with open(item_filename + '_trans_' + to_lang + '.txt', 'w', encoding='utf-8') as f:
+				f.write(trans)
 
-	if translate:
-		## Write-up translated text
-		trans = GoogleTranslator(source=from_lang, target=to_lang).translate(text)
-		with open(item_filename + '_trans_' + to_lang + '.txt', 'w', encoding='utf-8') as f:
-			f.write(trans)
+
+if __name__ == '__main__':
+	## define the command line arguments
+	ap = ArgParser(description="Extract text from an image and optionally translate it to a second language")
+	ap.add_argument("image", help="path to the input image")
+	ap.add_argument("-l", "--lang", help="input language (2-character ISO 639-1 language codes, default: 'en')", default="en")
+	ap.add_argument("-t", "--to", type=str, help="translated language (2-charachter ISO 639-1 codes, default: 'en')", default="en")
+	ap.add_argument("-p", "--psm", type=int, help="Tesseract PSM mode", default=3)
+
+	## parse the command line arguments
+	args = vars(ap.parse_args())
+	image = args["image"]
+	from_lang = args["lang"]
+	to_lang = args["to"]
+	psm = args["psm"]
+
+	main(image, from_lang, to_lang, psm)
