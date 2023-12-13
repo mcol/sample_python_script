@@ -51,12 +51,12 @@ with WImage(filename=item) as img:
 	text = pytesseract.image_to_string(gray_name, config=tess_options)
 
 	## Write-up original text
-	outfile = open(gray_name + '.txt', 'w', encoding='utf-8')
-	outfile.write(text)
+	with open(item + '.txt', 'w', encoding='utf-8') as outfile:
+		outfile.write(text)
 
 	if translate:
 		## Write-up translated text
 		translated=GoogleTranslator(source=from_lang, target=to_lang).translate(text)
 		trans=str(translated)
-		with open('translated_' + gray_name + '.txt', 'w', encoding='utf-8') as f:
+		with open(item + '_translated.txt', 'w', encoding='utf-8') as f:
 			f.write(trans)
