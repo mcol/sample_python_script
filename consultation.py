@@ -14,7 +14,7 @@ from iso639 import Language as iso
 pytesseract.tesseract_cmd = r"tesseract"
 
 ## command line arguments
-ap = argparse.ArgumentParser()
+ap = argparse.ArgumentParser(description="Extract text from an image and optionally translate it to a second language")
 ap.add_argument("-i", "--image", help="path to the input image", default="{name}")
 ap.add_argument("-l", "--lang", help="input language (2-character ISO 639-1 language codes, default: 'en')", default="en")
 ap.add_argument("-t", "--to", type=str, help="translated language (2-charachter ISO 639-1 codes, default: 'en')", default="en")
@@ -27,6 +27,9 @@ to_lang = args["to"]
 
 ## 3-letter code of the translation language
 tess_lang = iso.from_part1(from_lang).part2t
+
+## is translation required?
+translate = True if from_lang != to_lang else False
 
 ## options for pytesseract
 tess_options = "-l {} --psm {}".format(tess_lang, args["psm"])
@@ -51,8 +54,9 @@ with WImage(filename=item) as img:
 	outfile = open(gray_name + '.txt', 'w', encoding='utf-8')
 	outfile.write(text)
 
-	## Write-up translated text
-	translated=GoogleTranslator(source=from_lang, target=to_lang).translate(text)
-	trans=str(translated)
-	with open('translated_' + gray_name + '.txt', 'w', encoding='utf-8') as f:
-		f.write(trans)
+	if translate:
+		## Write-up translated text
+		translated=GoogleTranslator(source=from_lang, target=to_lang).translate(text)
+		trans=str(translated)
+		with open('translated_' + gray_name + '.txt', 'w', encoding='utf-8') as f:
+			f.write(trans)
