@@ -44,7 +44,7 @@ with WImage(filename=item) as img:
 
 	## Transform image from color to grayscale
 	img.transform_colorspace('gray')
-	img.adaptive_threshold(width=16, height=16, offset=-0.15 * img.quantum_range)
+	img.adaptive_threshold(width=16, height=16, offset=0.15 * img.quantum_range)
 	img.save(filename=gray_name)
 
 	## Extract the text
