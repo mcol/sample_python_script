@@ -18,24 +18,24 @@ args = vars(ap.parse_args())
 ## options for pytesseract
 options = "-l {} --psm 3 {}".format(args["lang"], args["psm 3"])
 
-list = ["im1.jpg", "img2.jpg"]
-for item in list:
-    print("Processing image {}".format(item))
-    filenam = item.rsplit('.',1)[1]
-    ### Transform image from color to grayscale
-    with WImage(filename=item) as img:
-        img.transform_colorspace('gray')
-        img.adaptive_threshold(width=16, height=16,
-        offset=-0.15 * img.quantum_range)
-        img.save(filename='gray_'+item)   
-    # ### Extract the text 
-        name='gray_'+item
-        text = pytesseract.image_to_string(name)
-    # ### Write-up original text
-        outfile = open('gray_'+item+'.txt', 'w', encoding='utf-8')
-        outfile.write(text)
-    # ## Write-up translated text
-        translated=GoogleTranslator(source='auto', target=args["to"]).translate(text)    
-        trans=str(translated)
-        with open('gray_translated_'+item+'.txt', 'w', encoding='utf-8') as f:
-            f.write(trans)
+## image to process
+item = args["image"]
+print("Processing image {}".format(item))
+
+### Transform image from color to grayscale
+with WImage(filename=item) as img:
+	img.transform_colorspace('gray')
+	img.adaptive_threshold(width=16, height=16,
+	offset=-0.15 * img.quantum_range)
+	img.save(filename='gray_'+item)
+# ### Extract the text
+	name='gray_'+item
+	text = pytesseract.image_to_string(name)
+# ### Write-up original text
+	outfile = open('gray_'+item+'.txt', 'w', encoding='utf-8')
+	outfile.write(text)
+# ## Write-up translated text
+	translated=GoogleTranslator(source='auto', target=args["to"]).translate(text)
+	trans=str(translated)
+	with open('gray_translated_'+item+'.txt', 'w', encoding='utf-8') as f:
+		f.write(trans)
